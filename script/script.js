@@ -1,7 +1,6 @@
 const message = (text) => {
     $("#chat-result").append(text);
 }
-console.log(123);
 $(function (){
 
     let socket = new WebSocket("ws://localhost:8090/thisq/server.php");
