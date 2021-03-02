@@ -1,5 +1,5 @@
 <?php
-define('PORT', "8090    ");
+define('PORT', "8090");
 
 require_once "classes/Chat.php";
 
@@ -11,11 +11,46 @@ socket_bind($socket, 0, PORT);
 
 socket_listen($socket);
 
+$clientSocketArray = array($socket);
+
 while(true){
-    $newSocket = socket_accept($socket);
-    $header = socket_read($newSocket, 1024);
-    $ret = $chat->sendHeaders($header, $newSocket, 'localhost/thisq/', PORT);
-    print_r($ret);
+    $newSocketArray = $clientSocketArray;
+    $nullA = [];
+    socket_select($newSocketArray, $nullA, $nullA, 0, 10);
+
+    if(in_array($socket, $newSocketArray)){
+        $newSocket = socket_accept($socket);
+        $clientSocketArray[] = $newSocket;
+        
+        $header = socket_read($newSocket, 1024);
+        $chat->sendHeaders($header, $newSocket, 'localhost/thisq/', PORT);
+    
+        socket_getpeername($newSocket, $client_ip_address);
+        $connectionACK = $chat->newConnectionACK($client_ip_address);
+        
+        $chat->send($connectionACK, $clientSocketArray);
+
+        $newSocketArrayIndex = array_search($socket, $newSocketArray);
+        unset($newSocketArray[$newSocketArrayIndex]);
+    }
+
+    foreach($newSocketArray as $newSocketArrayResource){
+        //1
+        while(socket_recv($newSocketArrayResource, $socketData, 1024, 0) >= 1){
+            $socketMessage = $chat->unseal($socketData);
+            
+            $messageObj = json_decode($socketMessage);
+            print_r($messageObj);
+            $chatMessage = $chat->createChatMessage($messageObj->chat_user, $messageObj->chat_message);
+            
+            $chat->send($chatMessage, $clientSocketArray);
+            
+            break 2;
+        }
+        //2
+
+    }
+    
 }
 
 socket_close($socket);
