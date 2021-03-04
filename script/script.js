@@ -9,7 +9,7 @@ $(function (){
         message("<div>Соединение установлено</div>");
     };
 
-    socket.onerror =  (error) => {
+    socket.onerror = (error) => {
         message("<div>Ошибка при соединении " + error.message + "</div>");
     };
 
@@ -31,8 +31,11 @@ $(function (){
 
         $("#chat-user").attr("type", "hidden");
         $("#chat-message").val("");
+        
         socket.send(JSON.stringify(message));
 
         return false;
     });
+
+    
 });
