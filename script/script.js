@@ -30,6 +30,7 @@ $(function (){
         };
 
         $("#chat-user").attr("type", "hidden");
+        $("#chat-message").val("");
         socket.send(JSON.stringify(message));
 
         return false;

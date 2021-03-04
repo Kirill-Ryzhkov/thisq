@@ -103,11 +103,22 @@ class Chat {
     public function createChatMessage($username, $messageStr){
         $message = $username . "<div>" . $messageStr . "</div>";
         $messageArray = [
-            'type' => 'chat-box',
+            'type' => 'name',
             'message' => $message
         ];
 
         return $this->seal(json_encode($messageArray));
+    }
+
+
+    public function newDisconnectionACK($client_ip_address){
+        $message = "New client ".$client_ip_address." disconnected";
+        $messageArray = [
+            "message" => $message,
+            "type" => "newConnectionACK"
+        ];
+        $ack = $this->seal(json_encode($messageArray));
+        return $ack;
     }
 
 
