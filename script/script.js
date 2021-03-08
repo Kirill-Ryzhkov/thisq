@@ -1,5 +1,5 @@
 const message = (text) => {
-    $("#chat-result").append(text);
+    $("#chat-before").before(text);
 }
 $(function (){
 
